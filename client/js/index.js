@@ -1,5 +1,9 @@
 let btnAgregar = document.querySelector("#btnAgregar");
-btnAgregar.addEventListener("click", cargarCompraMock);
+btnAgregar.addEventListener("click", function(){
+    let input1 = document.querySelector('#producto').value;
+    let input2 = document.querySelector('#precio').value;
+    (input1 === "" && input2 === "")? load() :  agregar(); // Carga el mock.json o lo que se le pase por Inputs!
+});
 
 let btnTotal = document.querySelector("#btnTotal");
 btnTotal.addEventListener("click", sumar);
@@ -8,7 +12,6 @@ let compras = [];
 //Metodo que permite agregar productos de manera Manual
 function agregar() {
     console.log("Funcion Agregar");
-
     let producto = document.querySelector('#producto').value;
     let precio = parseInt(document.querySelector('#precio').value);
 
@@ -18,13 +21,12 @@ function agregar() {
     }
     compras.push(renglon);
 
-    mostrarTablaCompras();
+    mostrarTablaCompras(compras);
 
 }
-// metodo que muestra las compras que se cargan por la app(manualmente).
-function mostrarTablaCompras() {
+ async function mostrarTablaCompras(array) {
     html = "";
-    compras.forEach(item => {
+    await array.forEach(item => {
         html += `
         <tr>
             <td>${item.producto}</td>
@@ -51,25 +53,9 @@ function sumar() {
         "<p>Total: $" + total + "</p>" +
         "<p>Maximo: $" + max + "</p>"
 }
-
-// metodo que imprime las compras Mockeadas
-async function cargarCompraMock() {
-    let compraMockeada = await load();
-
-    let html = "";
-    compraMockeada.forEach(item => {
-        html += `
-        <tr>
-            <td>${item.producto}</td>
-            <td>${item.precio}</td>
-        </tr>
-     `;
-    });
-
-    document.querySelector("#tblCompras").innerHTML = html;
-}
-//Carga la API Mockeada y retorna lo que se necesita del Json: compra
+//metodo que llena la tabla con una compra Mockeada!
 async function load() {
+    console.log('funcion load');
     let mensaje = document.querySelector("#tblCompras");
     mensaje.innerHTML =  "<h1>......................Loading!</h1>";
 
@@ -77,7 +63,8 @@ async function load() {
         let response = await fetch('http://localhost:3000/mock.json')
             if (response.ok){
                 let compraMock = await response.json();
-                return  compraMock.compra;
+                    compraMock = compraMock.compra;
+                mensaje.innerHTML = mostrarTablaCompras(compraMock);
             }else{
                 mensaje.innerHTML = "<h1>Error...Failed URL!</h1>"
             }
@@ -85,7 +72,7 @@ async function load() {
         mensaje.innerHTML = "<h1>Conection Error!</h1>"
     }
     
-    //-------OTRA MANERA DE HACER LO MISMO---------
+    //-------OTRA MANERA DE TRAER LA PROMESA Y OBTENER DE ELLA LO NECESARIO---------
     // let comprasMock = {};
     // await fetch('http://localhost:3000/mock.json')
     //     .then(response => response.json()) //Parseando a obj
