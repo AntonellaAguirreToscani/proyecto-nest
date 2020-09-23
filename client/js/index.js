@@ -14,10 +14,12 @@ function agregar() {
     console.log("Funcion Agregar");
     let producto = document.querySelector('#producto').value;
     let precio = parseInt(document.querySelector('#precio').value);
+    let descripcion = document.querySelector('#descripcion').value;
 
     let renglon = {
         "producto": producto,
-        "precio": precio
+        "precio": precio,
+        "descripcion" : descripcion
     }
     compras.push(renglon);
 
@@ -31,6 +33,7 @@ function agregar() {
         <tr>
             <td>${item.producto}</td>
             <td>${item.precio}</td>
+            <td>${item.descripcion}</td>
         </tr>
          `;
     });
@@ -55,15 +58,14 @@ function sumar() {
 }
 //metodo que llena la tabla con una compra Mockeada!
 async function load() {
-    console.log('funcion load');
     let mensaje = document.querySelector("#tblCompras");
     mensaje.innerHTML =  "<h1>......................Loading!</h1>";
 
     try {
-        let response = await fetch('http://localhost:3000/mock.json')
+        let response = await fetch('/producto')
             if (response.ok){
                 let compraMock = await response.json();
-                    compraMock = compraMock.compra;
+
                 mensaje.innerHTML = mostrarTablaCompras(compraMock);
             }else{
                 mensaje.innerHTML = "<h1>Error...Failed URL!</h1>"
