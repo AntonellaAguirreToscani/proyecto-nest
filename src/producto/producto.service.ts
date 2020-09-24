@@ -1,28 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
-
-let productoslist: string = fs.readFileSync('C:/Users/atoscani/source/repos/proyecto-nest/cfp-demo/config/productos.txt', 'utf-8');
-let productos : string[] = productoslist.split('\n');
-
-let productosOk = [];
-for(let i = 0; i< productos.length; i++){
-    productosOk[i] = productos[i].split(',');
-}
+import { Producto } from 'src/producto.model';
 
 @Injectable()
 export class ProductoService {
-    private static readonly CANTIDAD_PRODUCTOS = 10;
+    private listaProductos: Producto[]
 
-    public getProducto(): any {
-        let productos = [];
-        for (let i = 0; i < ProductoService.CANTIDAD_PRODUCTOS; i++) {
-            let producto = {
-                'producto': productosOk[i][0],
-                'precio': productosOk[i][1],
-                'descripcion': productosOk[i][2]
-            };
-            productos.push(producto);
-        }
-        return productos;
+    public constructor() {
+        this.listaProductos = this.loadProductos();
     }
+    //Metodo que carga los Productos del archivo.csv
+    private loadProductos(): Producto[] {
+        let archivo = fs.readFileSync('C:/Users/atoscani/source/repos/proyecto-nest/cfp-demo/config/productos.csv', 'utf8');
+
+        const elementos: string[][] =
+            archivo.split('\n').map(item => item.replace('\r', '')).map(item => item.split(','));
+
+        let listaProductos = [];
+        for (let i = 0; i < elementos.length; i++) {
+            let producto = new Producto(elementos[i][0], parseInt(elementos[i][1]), elementos[i][2]);
+            listaProductos.push(producto);
+        }
+        return listaProductos;
+    }
+    public getProductos(): Producto[] {
+        return this.listaProductos;
+    }
+
+    public getProducto(id: string): Producto {
+        let producto: Producto;
+        this.listaProductos.forEach(item => {
+            if (item.producto === id) {
+                producto = item;
+            }
+        });
+        return producto;
+    }
+
 }

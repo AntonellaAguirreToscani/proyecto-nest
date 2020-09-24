@@ -1,12 +1,18 @@
-import { Controller } from '@nestjs/common';
+import { Controller, Param } from '@nestjs/common';
 import { Get } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Producto } from 'src/producto.model';
 import { ProductoService } from './producto.service';
 
-@Controller('producto')
+@Controller('productos')
 export class ProductoController {
     constructor(private productoService: ProductoService) { }
     @Get()
-    public getProducto(): string {
-        return this.productoService.getProducto()
+    public getProductos(): Producto[] {
+        return this.productoService.getProductos();
+    }
+    @Get(':id')
+    public getProducto(@Param('id') idProducto) : Producto{
+        let producto: string = idProducto.toLowerCase();
+        return this.productoService.getProducto(producto);
     }
 }
