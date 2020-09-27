@@ -1,8 +1,8 @@
 let btnAgregar = document.querySelector("#btnAgregar");
-btnAgregar.addEventListener("click", function(){
+btnAgregar.addEventListener("click", function () {
     let input1 = document.querySelector('#producto').value;
     let input2 = document.querySelector('#precio').value;
-    (input1 === "" && input2 === "")? load() :  agregar(); // Carga el mock.json o lo que se le pase por Inputs!
+    (input1 === "" && input2 === "") ? load() : agregar(); // Carga el mock.json o lo que se le pase por Inputs!
 });
 
 let btnTotal = document.querySelector("#btnTotal");
@@ -10,7 +10,7 @@ btnTotal.addEventListener("click", sumar);
 
 let compras = [];
 //Metodo que permite agregar productos de manera Manual
-function agregar() {
+async function agregar() {
     console.log("Funcion Agregar");
     let producto = document.querySelector('#producto').value;
     let precio = parseInt(document.querySelector('#precio').value);
@@ -19,14 +19,33 @@ function agregar() {
     let renglon = {
         "producto": producto,
         "precio": precio,
-        "descripcion" : descripcion
+        "descripcion": descripcion
     }
-    compras.push(renglon);
+    try {
+        if (renglon.producto != '' && renglon.precio > 0 && renglon.descripcion != '') {
+            let respuesta = await fetch('http://localhost:3000/productos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json' // Define que la app va a recibir un json
+                },
+                body: JSON.stringify(renglon) //Convierte el obj en json
+            });
+    
+            if (respuesta.ok) {
+                compras.push(renglon);
+                mostrarTablaCompras(compras);
+            }else{
+                throw Error('Invalid Response');
+            }
 
-    mostrarTablaCompras(compras);
-
+        }else{
+            throw Error('Parámetro/s Invalido/s');
+        }
+    } catch (error) {
+        console.log(error);
+    }   
 }
- async function mostrarTablaCompras(array) {
+async function mostrarTablaCompras(array) {
     html = "";
     await array.forEach(item => {
         html += `
@@ -59,21 +78,21 @@ function sumar() {
 //metodo que llena la tabla con una compra Mockeada!
 async function load() {
     let mensaje = document.querySelector("#tblCompras");
-    mensaje.innerHTML =  "<h1>......................Loading!</h1>";
+    mensaje.innerHTML = "<h1>......................Loading!</h1>";
 
     try {
-        let response = await fetch('/producto')
-            if (response.ok){
-                let compraMock = await response.json();
+        let response = await fetch('/productos')
+        if (response.ok) {
+            let compraMock = await response.json();
 
-                mensaje.innerHTML = mostrarTablaCompras(compraMock);
-            }else{
-                mensaje.innerHTML = "<h1>Error...Failed URL!</h1>"
-            }
+            mensaje.innerHTML = mostrarTablaCompras(compraMock);
+        } else {
+            mensaje.innerHTML = "<h1>Error...Failed URL!</h1>"
+        }
     } catch (response) {
         mensaje.innerHTML = "<h1>Conection Error!</h1>"
     }
-    
+
     //-------OTRA MANERA DE TRAER LA PROMESA Y OBTENER DE ELLA LO NECESARIO---------
     // let comprasMock = {};
     // await fetch('http://localhost:3000/mock.json')
