@@ -1,5 +1,5 @@
-import { Controller, Param } from '@nestjs/common';
-import { Get } from '@nestjs/common/decorators/http/request-mapping.decorator';
+import { Body, Controller, Param } from '@nestjs/common';
+import { Get, Post } from '@nestjs/common/decorators/http/request-mapping.decorator';
 import { Producto } from 'src/producto.model';
 import { ProductoService } from './producto.service';
 
@@ -15,4 +15,8 @@ export class ProductoController {
         let producto: string = idProducto.toLowerCase();
         return this.productoService.getProducto(producto);
     }
-}
+    @Post()
+    agregarProducto(@Body() producto : Producto):void{
+        this.productoService.agregar(producto);   
+    }
+}    

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
+import { stringify } from 'querystring';
 import { Producto } from 'src/producto.model';
 
 @Injectable()
@@ -37,4 +38,15 @@ export class ProductoService {
         return producto;
     }
 
+    public agregar(prod: Producto) {
+        const producto: Producto = new Producto(prod.producto, prod.precio, prod.descripcion);
+        try {
+            fs.appendFileSync('config/productos.csv',
+                `${'\n'}${producto.getNombre()},${producto.getPrecio()},${producto.getDescripcion()}`
+            );
+        } catch (error) {
+            console.log('Error Append');
+        }
+    }
 }
+

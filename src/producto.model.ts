@@ -8,4 +8,13 @@ export class Producto{
         this.precio = _precio;
         this.descripcion = _desc;
     }
+    public getNombre():string{
+        return this.producto;
+    }
+    public getPrecio():number{
+        return this.precio;
+    }
+    public getDescripcion():string{
+        return this.descripcion;
+    }
 }
